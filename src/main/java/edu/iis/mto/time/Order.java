@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
-import org.joda.time.Hours;
+import java.time.Clock;
 
 public class Order {
 	private static final int VALID_PERIOD_HOURS = 24;
 	private State orderState;
 	private List<OrderItem> items = new ArrayList<OrderItem>();
 	private DateTime subbmitionDate;
+	private Clock fakeClock;
 
-	public Order() {
+	public Order(Clock fakeClock) {
 		orderState = State.CREATED;
+		this.fakeClock = fakeClock;
 	}
 
 	public void addItem(OrderItem item) {
@@ -24,17 +26,18 @@ public class Order {
 
 	}
 
-	public void submit() {
+	public void submit(DateTime sumbitData) {
 		requireState(State.CREATED);
 
 		orderState = State.SUBMITTED;
-		subbmitionDate = new DateTime();
+		subbmitionDate = sumbitData;
 
 	}
 
 	public void confirm() {
 		requireState(State.SUBMITTED);
-		int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime()).getHours();
+		long milisecondsElapsedAfterSubmittion = fakeClock.millis() - subbmitionDate.getMillis();
+		double hoursElapsedAfterSubmittion = milisecondsElapsedAfterSubmittion / 3600000.0;
 		if(hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS){
 			orderState = State.CANCELLED;
 			throw new OrderExpiredException();
