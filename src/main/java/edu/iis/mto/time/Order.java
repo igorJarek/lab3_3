@@ -1,5 +1,6 @@
 package edu.iis.mto.time;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +12,10 @@ public class Order {
 	private State orderState;
 	private List<OrderItem> items = new ArrayList<OrderItem>();
 	private DateTime subbmitionDate;
+	private Clock clock;
 
-	public Order() {
+	public Order(Clock clock) {
+		this.clock = clock;
 		orderState = State.CREATED;
 	}
 
@@ -28,7 +31,7 @@ public class Order {
 		requireState(State.CREATED);
 
 		orderState = State.SUBMITTED;
-		subbmitionDate = new DateTime();
+		subbmitionDate = new DateTime(clock.instant().toString());
 
 	}
 
